@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="fragments/layout :: content">
+<body>
+<div th:fragment="content">
+    <h2>Admin Dashboard</h2>
+
+    <div th:if="${lowTutorAvailability}" class="alert alert-warning">
+        Alert: Low tutor availability compared to tutee demand!
+    </div>
+
+    <h3>Users</h3>
+    <ul>
+        <li th:each="u : ${users}" th:text="${u.fullName + ' (' + u.email + ') - ' + u.role}"></li>
+    </ul>
+
+    <h3>Outstanding Tutor Requests</h3>
+    <ul>
+        <li th:each="r : ${outstandingTutors}" th:text="${r.user.fullName + ' - ' + r.subject.name}"></li>
+    </ul>
+
+    <h3>Outstanding Tutee Requests</h3>
+    <ul>
+        <li th:each="r : ${outstandingTutees}" th:text="${r.user.fullName + ' - ' + r.subject.name}"></li>
+    </ul>
+
+    <h3>Current Matches</h3>
+    <ul>
+        <li th:each="m : ${matches}"
+            th:text="${m.tutorRequest.user.fullName + ' ↔ ' + m.tuteeRequest.user.fullName + ' (' + m.matchedTimeslot.label + ')'}"></li>
+    </ul>
+</div>
+</body>
+</html>

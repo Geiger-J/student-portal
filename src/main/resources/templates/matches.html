@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="fragments/layout :: content">
+<body>
+<div th:fragment="content">
+    <h2>My Matches</h2>
+
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Subject</th>
+            <th>Role</th>
+            <th>Partner</th>
+            <th>Timeslot</th>
+            <th>Status</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="m : ${matches}">
+            <td th:text="${m.tutorRequest.subject.name}">Maths</td>
+            <td>
+                <span th:if="${#authentication.name == m.tutorRequest.user.email}">Tutor</span>
+                <span th:if="${#authentication.name == m.tuteeRequest.user.email}">Tutee</span>
+            </td>
+            <td>
+                <span th:if="${#authentication.name == m.tutorRequest.user.email}" th:text="${m.tuteeRequest.user.fullName}"></span>
+                <span th:if="${#authentication.name == m.tuteeRequest.user.email}" th:text="${m.tutorRequest.user.fullName}"></span>
+            </td>
+            <td th:text="${m.matchedTimeslot.label}">Monday Period 3</td>
+            <td th:text="${m.status}">ACTIVE</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

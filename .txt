@@ -1,0 +1,64 @@
+student-matching-app/                             # Root project folder
+├── src/
+│   ├── main/
+│   │   ├── java/com/example/student_portal/
+│   │   │   ├── StudentPortalApplication.java          # Main Spring Boot entry point
+│   │   │
+│   │   │   ├── config/                           # Configuration classes
+│   │   │   │   ├── SecurityConfig.java           # Spring Security setup
+│   │   │   │   └── WebConfig.java                # Any global web configs
+│   │   │
+│   │   │   ├── controller/                       # Controllers for web routes
+│   │   │   │   ├── AuthController.java           # Login/Register/Logout
+│   │   │   │   ├── ProfileController.java        # Student profile edit
+│   │   │   │   ├── RequestController.java        # Tutor/Tutee requests
+│   │   │   │   ├── MatchController.java          # Matching status
+│   │   │   │   └── AdminController.java          # Admin dashboard
+│   │   │
+│   │   │   ├── entity/                           # JPA Entities = database tables
+│   │   │   │   ├── User.java
+│   │   │   │   ├── Subject.java
+│   │   │   │   ├── Timeslot.java
+│   │   │   │   ├── Request.java
+│   │   │   │   └── Match.java
+│   │   │
+│   │   │   ├── repository/                       # Data access layer
+│   │   │   │   ├── UserRepository.java
+│   │   │   │   ├── SubjectRepository.java
+│   │   │   │   ├── TimeslotRepository.java
+│   │   │   │   ├── RequestRepository.java
+│   │   │   │   └── MatchRepository.java
+│   │   │
+│   │   │   ├── service/                          # Business logic
+│   │   │   │   ├── UserService.java
+│   │   │   │   ├── RequestService.java
+│   │   │   │   ├── MatchService.java
+│   │   │   │   └── EmailService.java
+│   │   │
+│   │   │   └── util/                             # Helper utilities
+│   │   │       └── MatchingAlgorithm.java        # Hopcroft–Karp logic
+│   │   │
+│   │   ├── resources/
+│   │   │   ├── static/                           # Static files (CSS, JS)
+│   │   │   │   ├── css/
+│   │   │   │   │   └── style.css
+│   │   │   │   └── js/
+│   │   │   │       └── script.js
+│   │   │   ├── templates/                        # Thymeleaf HTML templates
+│   │   │   │   ├── auth/                         # Login/Register
+│   │   │   │   │   ├── login.html
+│   │   │   │   │   └── register.html
+│   │   │   │   ├── profile.html                  # Profile edit page
+│   │   │   │   ├── requests.html                 # Tutor/Tutee request form
+│   │   │   │   ├── matches.html                  # Match status page
+│   │   │   │   ├── admin.html                    # Admin dashboard
+│   │   │   │   └── fragments/                    # Reusable template pieces
+│   │   │   │       ├── header.html
+│   │   │   │       └── footer.html
+│   │   │   ├── application.properties            # Config (DB, mail, etc.)
+│   │   │   └── data.sql                          # Initial DB insert (subjects/timeslots)
+│   │   └── docker/                               # Docker setup files
+│   │       ├── Dockerfile                        # App build instructions
+│   │       └── docker-compose.yml                # Run app + Postgres together
+│   └── test/                                     # Unit tests
+├── pom.xml                                       # Maven dependencies
