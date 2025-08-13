@@ -4,6 +4,7 @@ import com.example.student_portal.entity.User;
 import com.example.student_portal.model.ExamBoard;
 import com.example.student_portal.model.YearGroup;
 import com.example.student_portal.model.TeachingMode;
+import com.example.student_portal.model.Period;
 import com.example.student_portal.service.SubjectService;
 import com.example.student_portal.service.TimeslotService;
 import com.example.student_portal.service.UserService;
@@ -13,6 +14,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.DayOfWeek;
+import java.util.List;
 
 /**
  * Enhanced profile controller for managing user profile including new fields:
@@ -105,5 +109,42 @@ public class ProfileController {
         model.addAttribute("subjects", subjectService.findAll());
         model.addAttribute("timeslots", timeslotService.findAll());
         model.addAttribute("availabilitySlots", availabilityService.getAvailabilitySlots(user));
+        model.addAttribute("weekdays", DayOfWeek.values());
+        model.addAttribute("periods", Period.values());
+    }
+
+    /**
+     * Handle availability updates from consolidated profile page.
+     */
+    @PostMapping("/profile/availability")
+    public String updateAvailability(@AuthenticationPrincipal UserDetails principal,
+                                   @RequestParam(required = false) List<String> slots,
+                                   Model model) {
+        User user = userService.findByEmail(principal.getUsername());
+        
+        try {
+            // Clear existing availability
+            availabilityService.clearAllAvailability(user);
+            
+            // Add selected slots
+            if (slots != null) {
+                for (String slotKey : slots) {
+                    String[] parts = slotKey.split("_");
+                    if (parts.length == 2) {
+                        DayOfWeek day = DayOfWeek.valueOf(parts[0].toUpperCase());
+                        Period period = Period.valueOf(parts[1].toUpperCase());
+                        availabilityService.addAvailabilitySlot(user, day, period);
+                    }
+                }
+            }
+            
+            model.addAttribute("successMessage", "Availability updated successfully!");
+            
+        } catch (Exception e) {
+            model.addAttribute("errorMessage", "Failed to update availability: " + e.getMessage());
+        }
+        
+        prepareModelForProfileView(user, model);
+        return "profile";
     }
 }

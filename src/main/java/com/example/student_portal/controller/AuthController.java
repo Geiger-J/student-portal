@@ -1,5 +1,12 @@
 package com.example.student_portal.controller;
 
+/*
+ * Authentication controller handling user login and registration flows.
+ * Manages user session creation with automatic authentication post-registration.
+ * Integrates with Spring Security for secure credential handling.
+ * Provides clean redirect flow to consolidated dashboard experience.
+ */
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
