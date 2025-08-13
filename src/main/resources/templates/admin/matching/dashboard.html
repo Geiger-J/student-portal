@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="https://www.thymeleaf.org/extras/spring-security">
-<head th:replace="fragments/header :: head"></head>
+<head th:replace="~{fragments/header :: head('Admin Matching - Student Portal', null)}"></head>
 <body>
-<header th:replace="fragments/header :: header"></header>
+<header th:replace="~{fragments/header :: header}"></header>
 
 <main class="container">
     <h2>Matching Algorithm Dashboard</h2>

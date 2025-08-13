@@ -6,9 +6,9 @@ Provides comprehensive user settings while maintaining clean navigation.
 Includes responsive form layouts and semantic HTML structure.
 -->
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="fragments/header :: head"></head>
+<head th:replace="~{fragments/header :: head('Profile - Student Portal', null)}"></head>
 <body>
-<header th:replace="fragments/header :: header"></header>
+<header th:replace="~{fragments/header :: header}"></header>
 <main class="container">
     <h2>My Profile</h2>
 
