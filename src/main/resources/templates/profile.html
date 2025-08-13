@@ -3,7 +3,6 @@
 <head th:replace="fragments/header :: head"></head>
 <body>
 <header th:replace="fragments/header :: header"></header>
-
 <main class="container">
     <h2>My Profile</h2>
 
@@ -16,31 +15,24 @@
             <input id="fullName" name="fullName" th:value="${user.fullName}" required/>
         </div>
         <div class="form-row">
-            <label for="yearGroup">Year group *</label>
-            <select id="yearGroup" name="yearGroup" required>
-                <option value="" disabled th:selected="${user.yearGroup == null}">Please select...</option>
-                <option th:each="yg : ${yearGroups}" th:value="${yg}" th:selected="${user.yearGroup != null && user.yearGroup == yg}" th:text="${yg}"></option>
+            <label for="yearGroup">Year group</label>
+            <select id="yearGroup" name="yearGroup">
+                <option value="" th:selected="${user.yearGroup == null}">-- Select --</option>
+                <option th:each="yg : ${yearGroups}" th:value="${yg}" th:selected="${user.yearGroup} == ${yg}" th:text="${yg}"></option>
             </select>
         </div>
         <div class="form-row">
-            <label for="examBoard">Exam board *</label>
-            <select id="examBoard" name="examBoard" required>
-                <option value="" disabled th:selected="${user.examBoard == null}">Please select...</option>
-                <option th:each="eb : ${examBoards}" th:value="${eb}" th:selected="${user.examBoard != null && user.examBoard == eb}" th:text="${eb}"></option>
+            <label for="examBoard">Exam board</label>
+            <select id="examBoard" name="examBoard">
+                <option value="" th:selected="${user.examBoard == null}">-- Select --</option>
+                <option th:each="eb : ${examBoards}" th:value="${eb}" th:selected="${user.examBoard} == ${eb}" th:text="${eb}"></option>
             </select>
-            <small>Year 12/13: select IB or A_LEVELS; otherwise choose NONE.</small>
+            <small>If not in exam years, leave blank or choose NONE (if available).</small>
         </div>
         <div class="form-row">
             <button class="btn" type="submit">Save</button>
         </div>
     </form>
 </main>
-
-<footer class="footer">
-    <div class="container">
-        <p>&copy; <span th:text="${#dates.format(#dates.createNow(), 'yyyy')}">2025</span> Bromsgrove School</p>
-    </div>
-</footer>
-
 </body>
 </html>

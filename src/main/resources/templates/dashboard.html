@@ -3,23 +3,18 @@
 <head th:replace="fragments/header :: head"></head>
 <body>
 <header th:replace="fragments/header :: header"></header>
-
 <main class="container">
     <h2>Dashboard</h2>
     
     <!-- Welcome Section -->
     <div class="welcome-section" style="margin-bottom: 24px;">
         <h3>Welcome, <span th:text="${user.fullName}">Student</span>!</h3>
-        
-        <!-- Profile Completeness -->
-        <div th:if="${!profileComplete}" class="alert alert-warning">
-            <strong>Complete Your Profile:</strong> 
-            Your profile is <span th:text="${profileScore}">75</span>% complete. 
-            <a th:href="@{/profile}">Update your profile</a> to improve matching accuracy.
+        <div th:if="${user.yearGroup == null or user.examBoard == null}" class="alert alert-warning">
+            Please complete your profile (Year Group / Exam Board) for better matches.
+            <a th:href="@{/profile}">Update profile</a>.
         </div>
-        
-        <div th:if="${profileComplete}" class="alert alert-success">
-            <strong>Profile Complete!</strong> Your profile is ready for matching.
+        <div th:if="${user.yearGroup != null and user.examBoard != null}" class="alert alert-success">
+            Profile academic details set. You're ready for matching.
         </div>
     </div>
     

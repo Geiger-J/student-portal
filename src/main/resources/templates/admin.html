@@ -3,7 +3,6 @@
 <head th:replace="fragments/header :: head"></head>
 <body>
 <header th:replace="fragments/header :: header"></header>
-
 <main class="container">
     <h2>Admin Dashboard</h2>
 
@@ -32,12 +31,5 @@
             th:text="${m.tutorRequest.user.fullName + ' ↔ ' + m.tuteeRequest.user.fullName + ' (' + m.matchedTimeslot.label + ')'}"></li>
     </ul>
 </main>
-
-<footer class="footer">
-    <div class="container">
-        <p>&copy; <span th:text="${#dates.format(#dates.createNow(), 'yyyy')}">2025</span> Bromsgrove School</p>
-    </div>
-</footer>
-
 </body>
 </html>

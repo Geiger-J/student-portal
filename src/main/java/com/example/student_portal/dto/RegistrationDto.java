@@ -1,14 +1,14 @@
 package com.example.student_portal.dto;
 
-import com.example.student_portal.model.ExamBoard;
-import com.example.student_portal.model.YearGroup;
-
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
+/**
+ * Simplified registration DTO: only full name, email, password. Year group and
+ * exam board are now set later on the profile page.
+ */
 public class RegistrationDto {
 
     @NotBlank
@@ -24,12 +24,6 @@ public class RegistrationDto {
     @Size(min = 8, message = "Password must be at least 8 characters long")
     private String password;
 
-    // Year group and exam board are now optional at registration
-    // They can be set later in the profile
-    private YearGroup yearGroup;
-
-    private ExamBoard examBoard;
-
     public String getFullName() { return fullName; }
 
     public void setFullName(String fullName) { this.fullName = fullName; }
@@ -41,12 +35,4 @@ public class RegistrationDto {
     public String getPassword() { return password; }
 
     public void setPassword(String password) { this.password = password; }
-
-    public YearGroup getYearGroup() { return yearGroup; }
-
-    public void setYearGroup(YearGroup yearGroup) { this.yearGroup = yearGroup; }
-
-    public ExamBoard getExamBoard() { return examBoard; }
-
-    public void setExamBoard(ExamBoard examBoard) { this.examBoard = examBoard; }
 }

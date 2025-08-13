@@ -3,10 +3,8 @@
 <head th:replace="fragments/header :: head"></head>
 <body>
 <header th:replace="fragments/header :: header"></header>
-
 <main class="container">
     <h2>My Matches</h2>
-
     <table class="table">
         <thead>
         <tr>
@@ -19,7 +17,7 @@
         </thead>
         <tbody>
         <tr th:each="m : ${matches}">
-            <td th:text="${m.tutorRequest.subject.name}">Maths</td>
+            <td th:text="${m.tutorRequest.subject.name}">Subject</td>
             <td>
                 <span th:if="${#authentication.name == m.tutorRequest.user.email}">Tutor</span>
                 <span th:if="${#authentication.name == m.tuteeRequest.user.email}">Tutee</span>
@@ -28,18 +26,11 @@
                 <span th:if="${#authentication.name == m.tutorRequest.user.email}" th:text="${m.tuteeRequest.user.fullName}"></span>
                 <span th:if="${#authentication.name == m.tuteeRequest.user.email}" th:text="${m.tutorRequest.user.fullName}"></span>
             </td>
-            <td th:text="${m.matchedTimeslot.label}">Monday Period 3</td>
-            <td th:text="${m.status}">ACTIVE</td>
+            <td th:text="${m.matchedTimeslot.label}"></td>
+            <td th:text="${m.status}"></td>
         </tr>
         </tbody>
     </table>
 </main>
-
-<footer class="footer">
-    <div class="container">
-        <p>&copy; <span th:text="${#dates.format(#dates.createNow(), 'yyyy')}">2025</span> Bromsgrove School</p>
-    </div>
-</footer>
-
 </body>
 </html>

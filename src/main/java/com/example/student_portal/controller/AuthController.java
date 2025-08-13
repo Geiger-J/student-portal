@@ -14,8 +14,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import com.example.student_portal.dto.RegistrationDto;
-import com.example.student_portal.model.ExamBoard;
-import com.example.student_portal.model.YearGroup;
 import com.example.student_portal.service.UserService;
 
 import jakarta.validation.Valid;
@@ -39,7 +37,6 @@ public class AuthController {
     @GetMapping("/register")
     public String registerForm(Model model) {
         model.addAttribute("form", new RegistrationDto());
-        // Year group and exam board are now collected in profile editing
         return "auth/register";
     }
 
@@ -50,19 +47,19 @@ public class AuthController {
         if (userService.existsByEmail(form.getEmail())) {
             errors.rejectValue("email", "exists", "Email already in use");
         }
+
         if (errors.hasErrors()) {
             log.debug("Registration validation errors: {}", errors);
             return "auth/register";
         }
 
-        // Register with null yearGroup and examBoard - they'll be set in profile
+        // Register with null yearGroup and examBoard (set later on profile)
         userService.registerUser(form.getFullName(), form.getEmail(), form.getPassword(), null, null);
 
-        // Auto-login
         Authentication auth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(form.getEmail(), form.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(auth);
 
         log.info("Registered and auto-logged in user {}", form.getEmail());
-        return "redirect:/";
+        return "redirect:/dashboard";
     }
 }
