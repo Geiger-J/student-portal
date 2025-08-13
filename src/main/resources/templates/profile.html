@@ -16,15 +16,17 @@
             <input id="fullName" name="fullName" th:value="${user.fullName}" required/>
         </div>
         <div class="form-row">
-            <label for="yearGroup">Year group</label>
-            <select id="yearGroup" name="yearGroup">
-                <option th:each="yg : ${yearGroups}" th:value="${yg}" th:selected="${user.yearGroup} == ${yg}" th:text="${yg}"></option>
+            <label for="yearGroup">Year group *</label>
+            <select id="yearGroup" name="yearGroup" required>
+                <option value="" disabled th:selected="${user.yearGroup == null}">Please select...</option>
+                <option th:each="yg : ${yearGroups}" th:value="${yg}" th:selected="${user.yearGroup != null && user.yearGroup == yg}" th:text="${yg}"></option>
             </select>
         </div>
         <div class="form-row">
-            <label for="examBoard">Exam board</label>
-            <select id="examBoard" name="examBoard">
-                <option th:each="eb : ${examBoards}" th:value="${eb}" th:selected="${user.examBoard} == ${eb}" th:text="${eb}"></option>
+            <label for="examBoard">Exam board *</label>
+            <select id="examBoard" name="examBoard" required>
+                <option value="" disabled th:selected="${user.examBoard == null}">Please select...</option>
+                <option th:each="eb : ${examBoards}" th:value="${eb}" th:selected="${user.examBoard != null && user.examBoard == eb}" th:text="${eb}"></option>
             </select>
             <small>Year 12/13: select IB or A_LEVELS; otherwise choose NONE.</small>
         </div>
