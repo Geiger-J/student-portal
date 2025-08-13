@@ -6,6 +6,7 @@ import com.example.student_portal.model.YearGroup;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -80,6 +81,28 @@ public class Request {
     @Column(name = "year_group", nullable = false)
     private YearGroup yearGroup;
 
+    /**
+     * Target week for this request (ISO week Monday date).
+     * Requests are typically created for the upcoming week.
+     */
+    @Column(name = "target_week")
+    private LocalDate targetWeek;
+
+    /**
+     * Whether this request should recur weekly.
+     * For tutee requests: indicates desire for weekly recurrence.
+     * For tutor requests: indicates acceptance of weekly recurrence.
+     */
+    @Column(name = "is_recurring")
+    private Boolean isRecurring = false;
+
+    /**
+     * Reference to the matched partner request (if this request has been matched).
+     */
+    @ManyToOne
+    @JoinColumn(name = "matched_partner_id")
+    private Request matchedPartner;
+
     public Request() { }
 
     // Getters and setters
@@ -103,4 +126,27 @@ public class Request {
 
     public YearGroup getYearGroup() { return yearGroup; }
     public void setYearGroup(YearGroup yearGroup) { this.yearGroup = yearGroup; }
+
+    public LocalDate getTargetWeek() { return targetWeek; }
+    public void setTargetWeek(LocalDate targetWeek) { this.targetWeek = targetWeek; }
+
+    public Boolean getIsRecurring() { return isRecurring; }
+    public void setIsRecurring(Boolean isRecurring) { this.isRecurring = isRecurring; }
+
+    public Request getMatchedPartner() { return matchedPartner; }
+    public void setMatchedPartner(Request matchedPartner) { this.matchedPartner = matchedPartner; }
+
+    /**
+     * Helper method to check if this request is for recurrence.
+     */
+    public boolean isRecurring() {
+        return isRecurring != null && isRecurring;
+    }
+
+    /**
+     * Helper method to check if this request has been matched.
+     */
+    public boolean isMatched() {
+        return status == RequestStatus.MATCHED && matchedPartner != null;
+    }
 }

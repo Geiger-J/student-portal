@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="https://www.thymeleaf.org/extras/spring-security">
+<head th:replace="fragments/layout :: head"></head>
+<body>
+<header th:replace="fragments/layout :: header"></header>
+
+<main class="container">
+    <h2>Dashboard</h2>
+    
+    <!-- Welcome Section -->
+    <div class="welcome-section" style="margin-bottom: 24px;">
+        <h3>Welcome, <span th:text="${user.fullName}">Student</span>!</h3>
+        
+        <!-- Profile Completeness -->
+        <div th:if="${!profileComplete}" class="alert alert-warning">
+            <strong>Complete Your Profile:</strong> 
+            Your profile is <span th:text="${profileScore}">75</span>% complete. 
+            <a th:href="@{/profile}">Update your profile</a> to improve matching accuracy.
+        </div>
+        
+        <div th:if="${profileComplete}" class="alert alert-success">
+            <strong>Profile Complete!</strong> Your profile is ready for matching.
+        </div>
+    </div>
+    
+    <!-- Quick Stats -->
+    <div class="stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;">
+        <div class="stat-card" style="background: white; padding: 16px; border-radius: 8px; border: 1px solid #ddd;">
+            <h4 style="margin-top: 0;">Total Requests</h4>
+            <p style="font-size: 24px; font-weight: bold; color: #8b0000; margin: 0;" th:text="${totalRequests}">0</p>
+        </div>
+        
+        <div class="stat-card" style="background: white; padding: 16px; border-radius: 8px; border: 1px solid #ddd;">
+            <h4 style="margin-top: 0;">Pending Requests</h4>
+            <p style="font-size: 24px; font-weight: bold; color: #e67e00; margin: 0;" th:text="${pendingRequests}">0</p>
+        </div>
+        
+        <div class="stat-card" style="background: white; padding: 16px; border-radius: 8px; border: 1px solid #ddd;">
+            <h4 style="margin-top: 0;">Active Matches</h4>
+            <p style="font-size: 24px; font-weight: bold; color: #0a6b2c; margin: 0;" th:text="${completedMatches}">0</p>
+        </div>
+    </div>
+    
+    <!-- Active Requests Section -->
+    <div class="section" style="margin-bottom: 32px;">
+        <h3>Active Requests</h3>
+        
+        <div th:if="${#lists.isEmpty(activeRequests)}">
+            <p>You have no active requests. <a th:href="@{/requests}">Create a new request</a> to get started.</p>
+        </div>
+        
+        <div th:if="${!#lists.isEmpty(activeRequests)}">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Type</th>
+                        <th>Subject</th>
+                        <th>Target Week</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="request : ${activeRequests}">
+                        <td>
+                            <span class="badge" th:classappend="${request.type.name() == 'TUTOR'} ? 'badge-tutor' : 'badge-tutee'"
+                                  th:text="${request.type.name()}">TUTOR</span>
+                        </td>
+                        <td th:text="${request.subject.name}">Mathematics</td>
+                        <td th:text="${request.targetWeek != null ? request.targetWeek : 'Not set'}">2025-01-20</td>
+                        <td>
+                            <span class="badge badge-pending" th:text="${request.status.name()}">OUTSTANDING</span>
+                        </td>
+                        <td>
+                            <a th:href="@{/requests}" class="btn btn-sm">Manage</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Matched Requests Section -->
+    <div class="section" style="margin-bottom: 32px;">
+        <h3>Current Matches</h3>
+        
+        <div th:if="${#lists.isEmpty(userMatches)}">
+            <p>You don't have any current matches. Active requests will be matched during the weekly matching process.</p>
+        </div>
+        
+        <div th:if="${!#lists.isEmpty(userMatches)}">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Subject</th>
+                        <th>Partner</th>
+                        <th>Role</th>
+                        <th>Timeslot</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="match : ${userMatches}">
+                        <td th:text="${match.tutorRequest.subject.name}">Mathematics</td>
+                        <td>
+                            <span th:if="${match.tutorRequest.user.id == user.id}" 
+                                  th:text="${match.tuteeRequest.user.fullName}">Partner Name</span>
+                            <span th:if="${match.tuteeRequest.user.id == user.id}" 
+                                  th:text="${match.tutorRequest.user.fullName}">Partner Name</span>
+                        </td>
+                        <td>
+                            <span th:if="${match.tutorRequest.user.id == user.id}" class="badge badge-tutor">Tutor</span>
+                            <span th:if="${match.tuteeRequest.user.id == user.id}" class="badge badge-tutee">Tutee</span>
+                        </td>
+                        <td th:text="${match.matchedTimeslot.label}">Monday Period 1</td>
+                        <td>
+                            <span class="badge badge-active" th:text="${match.status}">ACTIVE</span>
+                        </td>
+                        <td>
+                            <a th:href="@{/requests}" class="btn btn-sm">Manage</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Quick Actions -->
+    <div class="actions-section">
+        <h3>Quick Actions</h3>
+        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+            <a th:href="@{/requests}" class="btn">Create Request</a>
+            <a th:href="@{/profile}" class="btn">Update Profile</a>
+            <a th:href="@{/availability}" class="btn">Set Availability</a>
+            <a th:href="@{/subjects}" class="btn">Manage Subjects</a>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="fragments/layout :: footer"></footer>
+
+<style>
+/* Additional styles for dashboard */
+.badge-tutor {
+    background: #8b0000;
+    color: white;
+}
+
+.badge-tutee {
+    background: #0a6b2c;
+    color: white;
+}
+
+.badge-pending {
+    background: #e67e00;
+    color: white;
+}
+
+.badge-active {
+    background: #0a6b2c;
+    color: white;
+}
+
+.btn-sm {
+    padding: 4px 8px;
+    font-size: 12px;
+}
+</style>
+
+</body>
+</html>

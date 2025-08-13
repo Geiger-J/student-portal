@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="https://www.thymeleaf.org/extras/spring-security">
+<head th:replace="fragments/layout :: head"></head>
+<body>
+<header th:replace="fragments/layout :: header"></header>
+
+<main class="container">
+    <h2>Matching Algorithm Dashboard</h2>
+    
+    <!-- Success/Error Messages -->
+    <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+    <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+    
+    <!-- Statistics Overview -->
+    <div class="stats-overview" style="margin-bottom: 32px;">
+        <h3>Current Statistics</h3>
+        
+        <div class="stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+            <div class="stat-card" style="background: white; padding: 16px; border-radius: 8px; border: 1px solid #ddd;">
+                <h4 style="margin-top: 0; color: #e67e00;">Outstanding Tutors</h4>
+                <p style="font-size: 28px; font-weight: bold; margin: 0;" th:text="${outstandingTutors}">5</p>
+            </div>
+            
+            <div class="stat-card" style="background: white; padding: 16px; border-radius: 8px; border: 1px solid #ddd;">
+                <h4 style="margin-top: 0; color: #0a6b2c;">Outstanding Tutees</h4>
+                <p style="font-size: 28px; font-weight: bold; margin: 0;" th:text="${outstandingTutees}">8</p>
+            </div>
+            
+            <div class="stat-card" style="background: white; padding: 16px; border-radius: 8px; border: 1px solid #ddd;">
+                <h4 style="margin-top: 0; color: #8b0000;">Total Matches</h4>
+                <p style="font-size: 28px; font-weight: bold; margin: 0;" th:text="${totalMatches}">12</p>
+            </div>
+            
+            <div class="stat-card" style="background: white; padding: 16px; border-radius: 8px; border: 1px solid #ddd;">
+                <h4 style="margin-top: 0; color: #666;">Matching Potential</h4>
+                <p style="font-size: 28px; font-weight: bold; margin: 0;" th:text="${matchingPotential}">5</p>
+                <small style="color: #666;">Min(tutors, tutees)</small>
+            </div>
+        </div>
+        
+        <div class="efficiency-indicator" style="margin-top: 16px; padding: 12px; background: #f9f9f9; border-radius: 8px;">
+            <strong>Matching Efficiency:</strong> 
+            <span th:text="${efficiency} + '%'" style="font-size: 18px; color: #8b0000;">85.2%</span>
+            <small style="color: #666;">(matches / total requests)</small>
+        </div>
+    </div>
+    
+    <!-- Quick Actions -->
+    <div class="quick-actions" style="margin-bottom: 32px;">
+        <h3>Matching Controls</h3>
+        
+        <div class="action-buttons" style="display: flex; gap: 12px; flex-wrap: wrap;">
+            <form th:action="@{/admin/matching/run}" method="post" style="display: inline;">
+                <button type="submit" class="btn" 
+                        onclick="return confirm('Run the matching algorithm now? This will process all outstanding requests.')">
+                    🚀 Run Matching Now
+                </button>
+            </form>
+            
+            <form th:action="@{/admin/matching/generate-recurring}" method="post" style="display: inline;">
+                <button type="submit" class="btn" style="background: #0a6b2c;"
+                        onclick="return confirm('Generate recurring requests for next week?')">
+                    🔄 Generate Recurring Requests
+                </button>
+            </form>
+            
+            <form th:action="@{/admin/matching/clear-matches}" method="post" style="display: inline;">
+                <button type="submit" class="btn btn-danger"
+                        onclick="return confirm('Clear ALL matches? This action cannot be undone!')">
+                    🗑️ Clear All Matches
+                </button>
+            </form>
+        </div>
+        
+        <!-- Manual Week Selection -->
+        <div class="manual-matching" style="margin-top: 16px; padding: 16px; background: #f9f9f9; border-radius: 8px;">
+            <h4>Run Matching for Specific Week</h4>
+            <form th:action="@{/admin/matching/run-for-week}" method="post" style="display: flex; gap: 8px; align-items: end;">
+                <div class="form-row">
+                    <label for="targetWeek">Target Week (Monday date):</label>
+                    <input type="date" id="targetWeek" name="targetWeek" 
+                           th:value="${#dates.format(#dates.createNow(), 'yyyy-MM-dd')}"
+                           required style="width: 150px;"/>
+                </div>
+                <button type="submit" class="btn">Run for Week</button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Matching Insights -->
+    <div class="insights-section" style="margin-bottom: 32px;">
+        <h3>System Insights</h3>
+        
+        <div class="insights-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px;">
+            <div class="insight-card" style="background: white; padding: 16px; border-radius: 8px; border: 1px solid #ddd;">
+                <h4 style="margin-top: 0;">⚖️ Supply & Demand</h4>
+                <div th:if="${outstandingTutees > outstandingTutors * 2}" class="alert alert-warning" style="margin: 8px 0;">
+                    <strong>High demand:</strong> Tutees significantly outnumber tutors. Consider incentivizing more tutor signups.
+                </div>
+                <div th:if="${outstandingTutors > outstandingTutees * 2}" class="alert alert-warning" style="margin: 8px 0;">
+                    <strong>High supply:</strong> Tutors significantly outnumber tutees. Good capacity for matching.
+                </div>
+                <div th:if="${outstandingTutors > 0 && outstandingTutees > 0 && !(outstandingTutees > outstandingTutors * 2) && !(outstandingTutors > outstandingTutees * 2)}" 
+                     class="alert alert-success" style="margin: 8px 0;">
+                    <strong>Balanced:</strong> Good balance between tutors and tutees for optimal matching.
+                </div>
+            </div>
+            
+            <div class="insight-card" style="background: white; padding: 16px; border-radius: 8px; border: 1px solid #ddd;">
+                <h4 style="margin-top: 0;">📊 Algorithm Status</h4>
+                <p><strong>Algorithm:</strong> Hopcroft-Karp Maximum Bipartite Matching</p>
+                <p><strong>Complexity:</strong> O(E × √V)</p>
+                <p><strong>Features:</strong> Capacity constraints, timeslot uniqueness, year group validation</p>
+                <p><strong>Scheduled:</strong> Weekly on Monday 2:30 AM</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Activity -->
+    <div class="activity-section">
+        <h3>Quick Links</h3>
+        
+        <div class="quick-links" style="display: flex; gap: 12px; flex-wrap: wrap;">
+            <a th:href="@{/admin/matching/stats}" class="btn">📈 Detailed Statistics</a>
+            <a th:href="@{/admin/matching/recurrence}" class="btn">🔄 Manage Recurrence</a>
+            <a th:href="@{/admin}" class="btn">← Back to Admin Dashboard</a>
+        </div>
+    </div>
+    
+    <!-- System Information -->
+    <div class="system-info" style="margin-top: 32px; padding: 16px; background: #f9f9f9; border-radius: 8px;">
+        <h4>💡 System Information</h4>
+        <ul style="margin: 8px 0; padding-left: 20px;">
+            <li><strong>Matching Frequency:</strong> Weekly (configurable)</li>
+            <li><strong>Algorithm:</strong> Advanced Hopcroft-Karp implementation with capacity constraints</li>
+            <li><strong>Constraints:</strong> Subject compatibility, year group eligibility, tutor capacity limits</li>
+            <li><strong>Recurrence:</strong> Automatic weekly request generation for active recurring pairs</li>
+            <li><strong>Target Week:</strong> Requests are created for specific Monday-start weeks</li>
+        </ul>
+    </div>
+</main>
+
+<footer th:replace="fragments/layout :: footer"></footer>
+
+<style>
+/* Admin-specific styles */
+.stat-card {
+    text-align: center;
+}
+
+.efficiency-indicator {
+    text-align: center;
+}
+
+.action-buttons .btn {
+    white-space: nowrap;
+}
+
+.insight-card h4 {
+    border-bottom: 1px solid #eee;
+    padding-bottom: 8px;
+}
+
+.system-info ul li {
+    margin-bottom: 4px;
+    line-height: 1.4;
+}
+</style>
+
+</body>
+</html>
