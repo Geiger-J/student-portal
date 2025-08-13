@@ -22,7 +22,10 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.authorizeHttpRequests(auth -> auth.requestMatchers("/", "/login", "/register", "/css/**", "/js/**", "/images/**", "/webjars/**").permitAll().anyRequest().authenticated())
+        http.authorizeHttpRequests(auth -> auth
+                    .requestMatchers("/", "/login", "/register", "/css/**", "/js/**", "/images/**", "/webjars/**").permitAll()
+                    .requestMatchers("/api/chat/**").authenticated() // Permit authenticated users for chat API
+                    .anyRequest().authenticated())
                 .formLogin(form -> form.loginPage("/login").loginProcessingUrl("/login").failureUrl("/login?error").defaultSuccessUrl("/dashboard", true).permitAll())
                 .logout(logout -> logout.logoutUrl("/logout").logoutSuccessUrl("/login?logout").permitAll()).csrf(Customizer.withDefaults());
 

@@ -28,4 +28,10 @@ public interface MatchRepository extends JpaRepository<Match, Long> {
      * Find all matches where user is the tutee.
      */
     List<Match> findByTuteeRequest_User(User tutee);
+
+    /**
+     * Find matches by tutor or tutee request ID.
+     * Used for chat access control validation.
+     */
+    List<Match> findByTutorRequestIdOrTuteeRequestId(Long tutorRequestId, Long tuteeRequestId);
 }
