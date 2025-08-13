@@ -31,22 +31,29 @@ public class RequestService {
     private final RequestRepository requestRepository;
     private final SubjectRepository subjectRepository;
     private final TimeslotRepository timeslotRepository;
+    private final ValidationService validationService;
 
     public RequestService(RequestRepository requestRepository,
                           SubjectRepository subjectRepository,
-                          TimeslotRepository timeslotRepository) {
+                          TimeslotRepository timeslotRepository,
+                          ValidationService validationService) {
         this.requestRepository = requestRepository;
         this.subjectRepository = subjectRepository;
         this.timeslotRepository = timeslotRepository;
+        this.validationService = validationService;
     }
 
     /**
-     * Creates a new request if a duplicate outstanding one doesn't already exist.
+     * Creates a new request with comprehensive validation.
      */
     public Request createRequest(User user, Long subjectId, List<Long> timeslotIds, RequestType type) {
         Subject subject = subjectRepository.findById(subjectId)
             .orElseThrow(() -> new IllegalArgumentException("Subject not found"));
 
+        // Business rule validation
+        validationService.validateRequestCreation(user, subject, type);
+
+        // Check for existing outstanding request
         boolean alreadyExists = requestRepository.existsByUserAndSubjectAndTypeAndStatus(
             user, subject, type, RequestStatus.OUTSTANDING
         );
@@ -66,6 +73,9 @@ public class RequestService {
         request.setType(type);
         request.setStatus(RequestStatus.OUTSTANDING);
         request.setYearGroup(user.getYearGroup()); // store for convenience
+
+        // Validate the complete request
+        validationService.validateRequest(request);
 
         return requestRepository.save(request);
     }

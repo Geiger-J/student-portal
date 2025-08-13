@@ -7,6 +7,7 @@ import com.example.student_portal.model.ExamBoard;
 import com.example.student_portal.model.Role;
 import com.example.student_portal.model.YearGroup;
 import com.example.student_portal.model.TeachingMode;
+import com.example.student_portal.validation.ValidExamBoardForYearGroup;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -34,6 +35,7 @@ import jakarta.validation.constraints.Size;
  */
 @Entity
 @Table(name = "users")
+@ValidExamBoardForYearGroup
 public class User {
 
     // Primary key
@@ -108,6 +110,8 @@ public class User {
      * Used by the matching algorithm to respect tutor capacity constraints.
      */
     @Column(name = "max_sessions_per_week")
+    @jakarta.validation.constraints.Min(value = 1, message = "Must offer at least 1 session per week")
+    @jakarta.validation.constraints.Max(value = 10, message = "Cannot offer more than 10 sessions per week")
     private Integer maxSessionsPerWeek = 3; // Default to 3 sessions per week
 
     /**
