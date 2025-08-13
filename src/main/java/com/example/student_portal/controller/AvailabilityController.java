@@ -1,5 +1,12 @@
 package com.example.student_portal.controller;
 
+/*
+ * Controller for user availability slot management with consolidation support.
+ * Manages interactive grid interface for Monday-Friday, periods 1-7 scheduling.
+ * Provides redirect from legacy /availability route to consolidated profile page.
+ * Maintains backwards compatibility while encouraging profile page usage.
+ */
+
 import com.example.student_portal.entity.User;
 import com.example.student_portal.model.Period;
 import com.example.student_portal.service.AvailabilityService;
@@ -32,18 +39,12 @@ public class AvailabilityController {
     }
     
     /**
-     * Display the availability grid for the current user.
+     * Redirect legacy availability page to consolidated profile.
+     * Maintains backwards compatibility for bookmarked URLs.
      */
     @GetMapping
-    public String showAvailability(@AuthenticationPrincipal UserDetails principal, Model model) {
-        User user = userService.findByEmail(principal.getUsername());
-        
-        model.addAttribute("user", user);
-        model.addAttribute("availabilitySlots", availabilityService.getAvailabilitySlots(user));
-        model.addAttribute("weekdays", DayOfWeek.values());
-        model.addAttribute("periods", Period.values());
-        
-        return "availability";
+    public String redirectToProfile() {
+        return "redirect:/profile#availability";
     }
     
     /**
@@ -61,15 +62,14 @@ public class AvailabilityController {
             Period per = Period.valueOf(period.toUpperCase());
             
             availabilityService.addAvailabilitySlot(user, day, per);
-            model.addAttribute("successMessage", "Availability slot added successfully!");
             
         } catch (IllegalArgumentException e) {
-            model.addAttribute("errorMessage", "Invalid day or period specified");
+            return "redirect:/profile#availability?error=invalid";
         } catch (Exception e) {
-            model.addAttribute("errorMessage", "Failed to add availability slot: " + e.getMessage());
+            return "redirect:/profile#availability?error=add";
         }
         
-        return showAvailability(principal, model);
+        return "redirect:/profile#availability";
     }
     
     /**
@@ -87,15 +87,14 @@ public class AvailabilityController {
             Period per = Period.valueOf(period.toUpperCase());
             
             availabilityService.removeAvailabilitySlot(user, day, per);
-            model.addAttribute("successMessage", "Availability slot removed successfully!");
             
         } catch (IllegalArgumentException e) {
-            model.addAttribute("errorMessage", "Invalid day or period specified");
+            return "redirect:/profile#availability?error=invalid";
         } catch (Exception e) {
-            model.addAttribute("errorMessage", "Failed to remove availability slot: " + e.getMessage());
+            return "redirect:/profile#availability?error=remove";
         }
         
-        return showAvailability(principal, model);
+        return "redirect:/profile#availability";
     }
     
     /**
@@ -107,13 +106,12 @@ public class AvailabilityController {
         
         try {
             availabilityService.clearAllAvailability(user);
-            model.addAttribute("successMessage", "All availability slots cleared!");
             
         } catch (Exception e) {
-            model.addAttribute("errorMessage", "Failed to clear availability: " + e.getMessage());
+            return "redirect:/profile#availability?error=clear";
         }
         
-        return showAvailability(principal, model);
+        return "redirect:/profile#availability";
     }
     
     /**
@@ -142,12 +140,10 @@ public class AvailabilityController {
                 }
             }
             
-            model.addAttribute("successMessage", "Availability updated successfully!");
-            
         } catch (Exception e) {
-            model.addAttribute("errorMessage", "Failed to update availability: " + e.getMessage());
+            return "redirect:/profile#availability?error=update";
         }
         
-        return showAvailability(principal, model);
+        return "redirect:/profile#availability";
     }
 }

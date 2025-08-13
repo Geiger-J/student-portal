@@ -1,5 +1,12 @@
 package com.example.student_portal.controller;
 
+/*
+ * Controller for tutoring match display with consolidation support.
+ * Shows logged-in user's matches as both tutor and tutee.
+ * Provides redirect from legacy /matches route to consolidated dashboard.
+ * Maintains backwards compatibility while encouraging dashboard usage.
+ */
+
 import com.example.student_portal.entity.Match;
 import com.example.student_portal.entity.User;
 import com.example.student_portal.service.MatchService;
@@ -28,10 +35,7 @@ public class MatchController {
     }
 
     @GetMapping("/matches")
-    public String showMatches(@AuthenticationPrincipal UserDetails principal, Model model) {
-        User user = userService.findByEmail(principal.getUsername());
-        List<Match> matches = matchService.findMatchesByUser(user);
-        model.addAttribute("matches", matches);
-        return "matches";
+    public String redirectToDashboard() {
+        return "redirect:/dashboard#matches";
     }
 }

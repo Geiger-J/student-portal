@@ -1,5 +1,12 @@
 package com.example.student_portal.controller;
 
+/*
+ * Controller for tutoring request management with consolidation support.
+ * Handles request creation, status management, and recurrence functionality.
+ * Provides redirect from legacy /requests route to consolidated dashboard.
+ * Maintains backwards compatibility while encouraging dashboard usage.
+ */
+
 import com.example.student_portal.entity.Request;
 import com.example.student_portal.entity.User;
 import com.example.student_portal.model.RequestStatus;
@@ -62,27 +69,12 @@ public class RequestController {
     }
 
     /**
-     * Show list of user's requests and the creation form.
+     * Redirect legacy requests page to consolidated dashboard.
+     * Maintains backwards compatibility for bookmarked URLs.
      */
     @GetMapping
-    public String listRequests(@AuthenticationPrincipal UserDetails principal, Model model) {
-        User user = userService.findByEmail(principal.getUsername());
-
-        List<Request> requests = requestService.getRequestsByUser(user);
-        model.addAttribute("requests", requests);
-
-        // Empty form for creation
-        RequestForm form = new RequestForm();
-        form.targetWeek = getUpcomingMondayDate().toString();
-        model.addAttribute("requestForm", form);
-
-        // Dropdowns
-        model.addAttribute("subjects", subjectService.findAll());
-        model.addAttribute("timeslots", timeslotService.findAll());
-        model.addAttribute("requestTypes", RequestType.values());
-        model.addAttribute("upcomingMonday", getUpcomingMondayDate().toString());
-
-        return "requests";
+    public String redirectToDashboard() {
+        return "redirect:/dashboard#requests";
     }
 
     /**
@@ -104,17 +96,11 @@ public class RequestController {
                 requestService.updateRequest(request);
             }
             
-            model.addAttribute("successMessage", "Request created successfully!");
-            
         } catch (IllegalArgumentException | IllegalStateException ex) {
-            // Repopulate form and show error
-            populateModelForRequestView(user, model);
-            model.addAttribute("requestForm", form);
-            model.addAttribute("errorMessage", ex.getMessage());
-            return "requests";
+            return "redirect:/dashboard#requests?error=create";
         }
 
-        return "redirect:/requests";
+        return "redirect:/dashboard#requests";
     }
 
     /**
@@ -126,18 +112,16 @@ public class RequestController {
                               Model model) {
         Request req = requestService.findById(id);
         if (req == null || !isRequestOwnedByUser(req, principal)) {
-            model.addAttribute("errorMessage", "Request not found or access denied");
-            return listRequests(principal, model);
+            return "redirect:/dashboard#requests?error=notfound";
         }
 
         try {
             requestService.updateStatus(id, RequestStatus.REJECTED);
-            model.addAttribute("successMessage", "Request cancelled successfully!");
         } catch (Exception e) {
-            model.addAttribute("errorMessage", "Failed to cancel request: " + e.getMessage());
+            return "redirect:/dashboard#requests?error=cancel";
         }
 
-        return listRequests(principal, model);
+        return "redirect:/dashboard#requests";
     }
 
     /**
@@ -149,25 +133,22 @@ public class RequestController {
                                 Model model) {
         Request req = requestService.findById(id);
         if (req == null || !isRequestOwnedByUser(req, principal)) {
-            model.addAttribute("errorMessage", "Request not found or access denied");
-            return listRequests(principal, model);
+            return "redirect:/dashboard#requests?error=notfound";
         }
 
         if (req.getStatus() != RequestStatus.MATCHED) {
-            model.addAttribute("errorMessage", "Only matched requests can be marked as completed");
-            return listRequests(principal, model);
+            return "redirect:/dashboard#requests?error=notmatched";
         }
 
         try {
             // For now, we'll use REJECTED status to indicate completion
             // In a full implementation, we'd add a COMPLETED status
             requestService.updateStatus(id, RequestStatus.REJECTED);
-            model.addAttribute("successMessage", "Request marked as completed!");
         } catch (Exception e) {
-            model.addAttribute("errorMessage", "Failed to complete request: " + e.getMessage());
+            return "redirect:/dashboard#requests?error=complete";
         }
 
-        return listRequests(principal, model);
+        return "redirect:/dashboard#requests";
     }
 
     /**
@@ -179,18 +160,16 @@ public class RequestController {
                                   Model model) {
         Request req = requestService.findById(id);
         if (req == null || !isRequestOwnedByUser(req, principal)) {
-            model.addAttribute("errorMessage", "Request not found or access denied");
-            return listRequests(principal, model);
+            return "redirect:/dashboard#requests?error=notfound";
         }
 
         try {
             recurrenceService.requestRecurrence(id);
-            model.addAttribute("successMessage", "Weekly recurrence requested! Waiting for tutor acceptance.");
         } catch (Exception e) {
-            model.addAttribute("errorMessage", "Failed to request recurrence: " + e.getMessage());
+            return "redirect:/dashboard#requests?error=recurrence";
         }
 
-        return listRequests(principal, model);
+        return "redirect:/dashboard#requests";
     }
 
     /**
@@ -202,18 +181,16 @@ public class RequestController {
                                  Model model) {
         Request req = requestService.findById(id);
         if (req == null || !isRequestOwnedByUser(req, principal)) {
-            model.addAttribute("errorMessage", "Request not found or access denied");
-            return listRequests(principal, model);
+            return "redirect:/dashboard#requests?error=notfound";
         }
 
         try {
             recurrenceService.acceptRecurrence(id);
-            model.addAttribute("successMessage", "Weekly recurrence accepted! Future sessions will be automatically created.");
         } catch (Exception e) {
-            model.addAttribute("errorMessage", "Failed to accept recurrence: " + e.getMessage());
+            return "redirect:/dashboard#requests?error=acceptrecur";
         }
 
-        return listRequests(principal, model);
+        return "redirect:/dashboard#requests";
     }
 
     /**
@@ -225,18 +202,16 @@ public class RequestController {
                                  Model model) {
         Request req = requestService.findById(id);
         if (req == null || !isRequestOwnedByUser(req, principal)) {
-            model.addAttribute("errorMessage", "Request not found or access denied");
-            return listRequests(principal, model);
+            return "redirect:/dashboard#requests?error=notfound";
         }
 
         try {
             recurrenceService.cancelRecurrence(id);
-            model.addAttribute("successMessage", "Weekly recurrence cancelled.");
         } catch (Exception e) {
-            model.addAttribute("errorMessage", "Failed to cancel recurrence: " + e.getMessage());
+            return "redirect:/dashboard#requests?error=cancelrecur";
         }
 
-        return listRequests(principal, model);
+        return "redirect:/dashboard#requests";
     }
 
     /**
@@ -245,17 +220,6 @@ public class RequestController {
     private boolean isRequestOwnedByUser(Request request, UserDetails principal) {
         User user = userService.findByEmail(principal.getUsername());
         return request.getUser().getId().equals(user.getId());
-    }
-
-    /**
-     * Helper method to populate model for request view.
-     */
-    private void populateModelForRequestView(User user, Model model) {
-        model.addAttribute("requests", requestService.getRequestsByUser(user));
-        model.addAttribute("subjects", subjectService.findAll());
-        model.addAttribute("timeslots", timeslotService.findAll());
-        model.addAttribute("requestTypes", RequestType.values());
-        model.addAttribute("upcomingMonday", getUpcomingMondayDate().toString());
     }
 
     /**
