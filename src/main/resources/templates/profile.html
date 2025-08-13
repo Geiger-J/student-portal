@@ -1,4 +1,10 @@
 <!DOCTYPE html>
+<!--
+User profile management page with integrated availability scheduling.
+Consolidates profile editing and availability management into single interface.
+Provides comprehensive user settings while maintaining clean navigation.
+Includes responsive form layouts and semantic HTML structure.
+-->
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="fragments/header :: head"></head>
 <body>
@@ -7,32 +13,106 @@
     <h2>My Profile</h2>
 
     <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+    <div th:if="${param.error}" class="alert alert-danger">
+        <span th:if="${param.error[0] == 'invalid'}">Invalid availability slot specified.</span>
+        <span th:if="${param.error[0] == 'add'}">Failed to add availability slot.</span>
+        <span th:if="${param.error[0] == 'remove'}">Failed to remove availability slot.</span>
+        <span th:if="${param.error[0] == 'clear'}">Failed to clear availability.</span>
+        <span th:if="${param.error[0] == 'update'}">Failed to update availability.</span>
+    </div>
 
-    <form th:action="@{/profile}" method="post">
-        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-        <div class="form-row">
-            <label for="fullName">Full name</label>
-            <input id="fullName" name="fullName" th:value="${user.fullName}" required/>
-        </div>
-        <div class="form-row">
-            <label for="yearGroup">Year group</label>
-            <select id="yearGroup" name="yearGroup">
-                <option value="" th:selected="${user.yearGroup == null}">-- Select --</option>
-                <option th:each="yg : ${yearGroups}" th:value="${yg}" th:selected="${user.yearGroup} == ${yg}" th:text="${yg}"></option>
-            </select>
-        </div>
-        <div class="form-row">
-            <label for="examBoard">Exam board</label>
-            <select id="examBoard" name="examBoard">
-                <option value="" th:selected="${user.examBoard == null}">-- Select --</option>
-                <option th:each="eb : ${examBoards}" th:value="${eb}" th:selected="${user.examBoard} == ${eb}" th:text="${eb}"></option>
-            </select>
-            <small>If not in exam years, leave blank or choose NONE (if available).</small>
-        </div>
-        <div class="form-row">
-            <button class="btn" type="submit">Save</button>
-        </div>
-    </form>
+    <!-- Profile Information Section -->
+    <section class="profile-section">
+        <h3>Profile Information</h3>
+        <form th:action="@{/profile}" method="post">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+            <div class="form-row">
+                <label for="fullName">Full name</label>
+                <input id="fullName" name="fullName" th:value="${user.fullName}" required/>
+            </div>
+            <div class="form-row">
+                <label for="yearGroup">Year group</label>
+                <select id="yearGroup" name="yearGroup">
+                    <option value="" th:selected="${user.yearGroup == null}">-- Select --</option>
+                    <option th:each="yg : ${yearGroups}" th:value="${yg}" th:selected="${user.yearGroup} == ${yg}" th:text="${yg}"></option>
+                </select>
+            </div>
+            <div class="form-row">
+                <label for="examBoard">Exam board</label>
+                <select id="examBoard" name="examBoard">
+                    <option value="" th:selected="${user.examBoard == null}">-- Select --</option>
+                    <option th:each="eb : ${examBoards}" th:value="${eb}" th:selected="${user.examBoard} == ${eb}" th:text="${eb}"></option>
+                </select>
+                <small>If not in exam years, leave blank or choose NONE (if available).</small>
+            </div>
+            <div class="form-actions">
+                <button class="btn" type="submit">Save Profile</button>
+            </div>
+        </form>
+    </section>
+
+    <!-- Availability Management Section -->
+    <section class="availability-section" id="availability">
+        <h3>Manage Availability</h3>
+        <p>Select time slots when you are available for tutoring sessions.</p>
+
+        <form th:action="@{/profile/availability}" method="post">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+            <article class="availability-grid">
+                <table class="table availability-table">
+                    <thead>
+                    <tr>
+                        <th>Time</th>
+                        <th>Monday</th>
+                        <th>Tuesday</th>
+                        <th>Wednesday</th>
+                        <th>Thursday</th>
+                        <th>Friday</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="period : ${periods}">
+                        <td class="time-label" th:text="'Period ' + ${period.name().substring(1)}"></td>
+                        <td th:each="day : ${weekdays}">
+                            <input type="checkbox"
+                                   th:name="slots"
+                                   th:value="${day.name()} + '_' + ${period.name()}"
+                                   th:checked="${availabilitySlots.stream().anyMatch(slot -> slot.dayOfWeek.name() == day.name() && slot.period.name() == period.name())}"
+                                   class="availability-checkbox"/>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </article>
+
+            <div class="form-actions">
+                <button type="submit" class="btn">Update Availability</button>
+            </div>
+        </form>
+
+        <form th:action="@{/availability/clear}" method="post" class="clear-form">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+            <button type="submit" class="btn btn-danger"
+                    onclick="return confirm('Are you sure you want to clear all availability?')">Clear All</button>
+        </form>
+
+        <article class="availability-summary">
+            <h4>Current Availability Summary</h4>
+
+            <div th:if="${#lists.isEmpty(availabilitySlots)}">
+                <p class="alert alert-warning">No availability slots set.</p>
+            </div>
+
+            <div th:if="${!#lists.isEmpty(availabilitySlots)}">
+                <p>You are available for <strong th:text="${#lists.size(availabilitySlots)}">0</strong> slots:</p>
+                <div class="availability-badges">
+                    <span th:each="slot : ${availabilitySlots}"
+                          class="badge availability-badge"
+                          th:text="${#strings.capitalize(#strings.toLowerCase(slot.dayOfWeek.name()))} + ' Period ' + ${slot.period.name().substring(1)}"></span>
+                </div>
+            </div>
+        </article>
+    </section>
 </main>
 </body>
 </html>
