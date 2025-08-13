@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="https://www.thymeleaf.org/extras/spring-security">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8"/>
     <title th:text="${title} ?: 'Student Portal'">Student Portal</title>
@@ -10,47 +11,48 @@
 
 <!-- Header Fragment -->
 <header class="header" th:fragment="header">
-    <div class="container">
-        <h1><a th:href="@{/dashboard}">🎓 Bromsgrove Student Portal</a></h1>
-        <nav class="main-nav">
-            <a th:href="@{/dashboard}" th:classappend="${#httpServletRequest.requestURI == '/dashboard'} ? 'active' : ''">
-                📊 Dashboard
-            </a>
-            <a th:href="@{/profile}" th:classappend="${#strings.startsWith(#httpServletRequest.requestURI, '/profile')} ? 'active' : ''">
-                👤 Profile
-            </a>
-            <a th:href="@{/subjects}" th:classappend="${#strings.startsWith(#httpServletRequest.requestURI, '/subjects')} ? 'active' : ''">
-                📚 Subjects
-            </a>
-            <a th:href="@{/availability}" th:classappend="${#strings.startsWith(#httpServletRequest.requestURI, '/availability')} ? 'active' : ''">
-                📅 Availability
-            </a>
-            <a th:href="@{/requests}" th:classappend="${#strings.startsWith(#httpServletRequest.requestURI, '/requests')} ? 'active' : ''">
-                📝 Requests
-            </a>
-            <a th:href="@{/matches}" th:classappend="${#strings.startsWith(#httpServletRequest.requestURI, '/matches')} ? 'active' : ''">
-                🤝 Matches
-            </a>
-            
-            <!-- Admin Menu -->
-            <div sec:authorize="hasRole('ADMIN')" class="admin-dropdown" style="position: relative; display: inline-block;">
-                <a href="#" class="dropdown-toggle" onclick="toggleDropdown(event)">
-                    ⚙️ Admin ▼
-                </a>
-                <div class="dropdown-menu" style="display: none; position: absolute; top: 100%; right: 0; background: white; border: 1px solid #ddd; border-radius: 4px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); z-index: 1000; min-width: 200px;">
-                    <a th:href="@{/admin}" style="display: block; padding: 8px 12px; color: #333; text-decoration: none;">
-                        📈 Overview
-                    </a>
-                    <a th:href="@{/admin/matching}" style="display: block; padding: 8px 12px; color: #333; text-decoration: none;">
-                        🚀 Matching
-                    </a>
-                    <a th:href="@{/subjects/admin}" style="display: block; padding: 8px 12px; color: #333; text-decoration: none;">
-                        📚 Manage Subjects
-                    </a>
+    <div class="container header-flex">
+        <h1 class="site-title">
+            <a th:href="@{/dashboard}" sec:authorize="isAuthenticated()">🎓 Bromsgrove Student Portal</a>
+            <a th:href="@{/}" sec:authorize="isAnonymous()">🎓 Bromsgrove Student Portal</a>
+        </h1>
+
+        <!-- Authenticated Navigation -->
+        <nav class="main-nav" sec:authorize="isAuthenticated()">
+            <a th:href="@{/dashboard}"
+               th:classappend="${#httpServletRequest.requestURI == '/dashboard'} ? 'active' : ''">📊 Dashboard</a>
+            <a th:href="@{/profile}"
+               th:classappend="${#strings.startsWith(#httpServletRequest.requestURI, '/profile')} ? 'active' : ''">👤 Profile</a>
+            <a th:href="@{/subjects}"
+               th:classappend="${#strings.startsWith(#httpServletRequest.requestURI, '/subjects')} ? 'active' : ''">📚 Subjects</a>
+            <a th:href="@{/availability}"
+               th:classappend="${#strings.startsWith(#httpServletRequest.requestURI, '/availability')} ? 'active' : ''">📅 Availability</a>
+            <a th:href="@{/requests}"
+               th:classappend="${#strings.startsWith(#httpServletRequest.requestURI, '/requests')} ? 'active' : ''">📝 Requests</a>
+            <a th:href="@{/matches}"
+               th:classappend="${#strings.startsWith(#httpServletRequest.requestURI, '/matches')} ? 'active' : ''">🤝 Matches</a>
+
+            <!-- Admin Dropdown -->
+            <div sec:authorize="hasRole('ADMIN')" class="admin-dropdown">
+                <a href="#" class="dropdown-toggle" onclick="toggleDropdown(event)">⚙️ Admin ▼</a>
+                <div class="dropdown-menu">
+                    <a th:href="@{/admin}">📈 Overview</a>
+                    <a th:href="@{/admin/matching}">🚀 Matching</a>
+                    <a th:href="@{/subjects/admin}">📚 Manage Subjects</a>
                 </div>
             </div>
-            
-            <a th:href="@{/logout}" class="logout-btn">🚪 Logout</a>
+
+            <!-- Secure Logout (POST) -->
+            <form th:action="@{/logout}" method="post" class="logout-form">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                <button type="submit" class="logout-btn">🚪 Logout</button>
+            </form>
+        </nav>
+
+        <!-- Anonymous Navigation -->
+        <nav class="main-nav" sec:authorize="isAnonymous()">
+            <a class="auth-btn" th:href="@{/login}">🔐 Sign In</a>
+            <a class="auth-btn primary" th:href="@{/register}">📝 Register</a>
         </nav>
     </div>
 </header>
@@ -63,46 +65,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 </head>
 
-<!-- Main Content Container -->
-<main class="container" th:fragment="content">
-    <!-- Content will be inserted here -->
-    <div th:insert="${content}"></div>
-</main>
-
-<!-- Footer Fragment -->
-<footer class="footer" th:fragment="footer">
-    <div class="container">
-        <p>&copy; <span th:text="${#dates.format(#dates.createNow(), 'yyyy')}">2025</span> Bromsgrove School | 
-           <a href="mailto:support@bromsgrove-school.co.uk">Support</a> | 
-           <a href="#" onclick="alert('Student Portal v2.0 - Advanced Matching System')">About</a>
-        </p>
-    </div>
-</footer>
-
-<script>
-function toggleDropdown(event) {
-    event.preventDefault();
-    const dropdown = event.target.nextElementSibling;
-    const isVisible = dropdown.style.display !== 'none';
-    
-    // Hide all dropdowns first
-    document.querySelectorAll('.dropdown-menu').forEach(menu => {
-        menu.style.display = 'none';
+<script th:inline="javascript">
+/* Simple dropdown toggle */
+function toggleDropdown(e){
+    e.preventDefault();
+    const menu = e.target.closest('.admin-dropdown').querySelector('.dropdown-menu');
+    menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
+    document.addEventListener('click', function handler(ev){
+        if(!e.target.closest('.admin-dropdown').contains(ev.target)){
+            menu.style.display='none';
+            document.removeEventListener('click', handler);
+        }
     });
-    
-    // Toggle current dropdown
-    dropdown.style.display = isVisible ? 'none' : 'block';
 }
-
-// Close dropdown when clicking outside
-document.addEventListener('click', function(event) {
-    if (!event.target.matches('.dropdown-toggle')) {
-        document.querySelectorAll('.dropdown-menu').forEach(menu => {
-            menu.style.display = 'none';
-        });
-    }
-});
 </script>
-
 </body>
 </html>

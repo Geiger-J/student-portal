@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/extras/spring-security">
+<head th:replace="fragments/layout :: head"></head>
+<body>
+<header th:replace="fragments/layout :: header"></header>
+
+<main class="container">
+    <section class="hero-card">
+        <h2>Peer Tutoring & Matching Platform</h2>
+        <p class="lead">
+            Connect Bromsgrove students for academic support. Offer help as a tutor or request help as a tutee.
+            The system matches students each week based on subjects, availability, and year group suitability.
+        </p>
+
+        <div class="quick-actions" sec:authorize="isAnonymous()" style="margin: 1.5rem 0;">
+            <a class="button primary" th:href="@{/register}">📝 Create an Account</a>
+            <a class="button" th:href="@{/login}">🔐 Sign In</a>
+        </div>
+
+        <div class="how-it-works">
+            <h3>How It Works</h3>
+            <ol>
+                <li><strong>Register</strong> with your @bromsgrove-school.co.uk email.</li>
+                <li><strong>Complete your profile</strong>: year group, exam board, subjects, and availability.</li>
+                <li><strong>Create requests</strong>: Offer to tutor or ask for help.</li>
+                <li><strong>Weekly matching</strong>: The algorithm pairs compatible tutor & tutee requests.</li>
+                <li><strong>Manage matches</strong>: View active sessions and keep availability up to date.</li>
+            </ol>
+        </div>
+
+        <div class="info-panels">
+            <div class="panel">
+                <h4>Why Complete Your Profile?</h4>
+                <p>Better profile completeness increases match accuracy and speed.</p>
+            </div>
+            <div class="panel">
+                <h4>Availability Tips</h4>
+                <p>Add multiple time slots to improve chances of a successful weekly match.</p>
+            </div>
+            <div class="panel">
+                <h4>Be a Tutor</h4>
+                <p>Help younger years in subjects you’re strong in and build mentoring experience.</p>
+            </div>
+        </div>
+    </section>
+</main>
+</body>
+</html>

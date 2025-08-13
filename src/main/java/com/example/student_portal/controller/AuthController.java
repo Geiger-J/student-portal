@@ -1,5 +1,7 @@
 package com.example.student_portal.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -8,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import com.example.student_portal.dto.RegistrationDto;
@@ -19,6 +22,8 @@ import jakarta.validation.Valid;
 
 @Controller
 public class AuthController {
+
+    private static final Logger log = LoggerFactory.getLogger(AuthController.class);
 
     private final UserService userService;
     private final AuthenticationManager authenticationManager;
@@ -40,12 +45,14 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public String registerSubmit(@Valid RegistrationDto form, BindingResult errors, Model model) {
+    public String registerSubmit(@Valid @ModelAttribute("form") RegistrationDto form, BindingResult errors, Model model) {
+        log.debug("POST /register attempt email={} yearGroup={} examBoard={}", form.getEmail(), form.getYearGroup(), form.getExamBoard());
+
         if (userService.existsByEmail(form.getEmail())) {
             errors.rejectValue("email", "exists", "Email already in use");
         }
         if (errors.hasErrors()) {
-            model.addAttribute("form", form);
+            log.debug("Registration validation errors: {}", errors);
             model.addAttribute("yearGroups", YearGroup.values());
             model.addAttribute("examBoards", ExamBoard.values());
             return "auth/register";
@@ -57,6 +64,7 @@ public class AuthController {
         Authentication auth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(form.getEmail(), form.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(auth);
 
+        log.info("Registered and auto-logged in user {}", form.getEmail());
         return "redirect:/";
     }
 }
