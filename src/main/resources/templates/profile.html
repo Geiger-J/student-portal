@@ -1,26 +1,32 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" th:replace="fragments/layout :: content">
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/header :: head"></head>
 <body>
-<div th:fragment="content">
+<header th:replace="fragments/header :: header"></header>
+
+<main class="container">
     <h2>My Profile</h2>
 
     <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
 
     <form th:action="@{/profile}" method="post">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
         <div class="form-row">
             <label for="fullName">Full name</label>
             <input id="fullName" name="fullName" th:value="${user.fullName}" required/>
         </div>
         <div class="form-row">
-            <label for="yearGroup">Year group</label>
-            <select id="yearGroup" name="yearGroup">
-                <option th:each="yg : ${yearGroups}" th:value="${yg}" th:selected="${user.yearGroup} == ${yg}" th:text="${yg}"></option>
+            <label for="yearGroup">Year group *</label>
+            <select id="yearGroup" name="yearGroup" required>
+                <option value="" disabled th:selected="${user.yearGroup == null}">Please select...</option>
+                <option th:each="yg : ${yearGroups}" th:value="${yg}" th:selected="${user.yearGroup != null && user.yearGroup == yg}" th:text="${yg}"></option>
             </select>
         </div>
         <div class="form-row">
-            <label for="examBoard">Exam board</label>
-            <select id="examBoard" name="examBoard">
-                <option th:each="eb : ${examBoards}" th:value="${eb}" th:selected="${user.examBoard} == ${eb}" th:text="${eb}"></option>
+            <label for="examBoard">Exam board *</label>
+            <select id="examBoard" name="examBoard" required>
+                <option value="" disabled th:selected="${user.examBoard == null}">Please select...</option>
+                <option th:each="eb : ${examBoards}" th:value="${eb}" th:selected="${user.examBoard != null && user.examBoard == eb}" th:text="${eb}"></option>
             </select>
             <small>Year 12/13: select IB or A_LEVELS; otherwise choose NONE.</small>
         </div>
@@ -28,6 +34,13 @@
             <button class="btn" type="submit">Save</button>
         </div>
     </form>
-</div>
+</main>
+
+<footer class="footer">
+    <div class="container">
+        <p>&copy; <span th:text="${#dates.format(#dates.createNow(), 'yyyy')}">2025</span> Bromsgrove School</p>
+    </div>
+</footer>
+
 </body>
 </html>

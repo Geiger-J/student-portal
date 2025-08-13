@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="https://www.thymeleaf.org/extras/spring-security">
-<head th:replace="fragments/layout :: head"></head>
+<head th:replace="fragments/header :: head"></head>
 <body>
-<header th:replace="fragments/layout :: header"></header>
+<header th:replace="fragments/header :: header"></header>
 
 <main class="container">
     <h2>Matching Algorithm Dashboard</h2>
@@ -51,6 +51,7 @@
         
         <div class="action-buttons" style="display: flex; gap: 12px; flex-wrap: wrap;">
             <form th:action="@{/admin/matching/run}" method="post" style="display: inline;">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
                 <button type="submit" class="btn" 
                         onclick="return confirm('Run the matching algorithm now? This will process all outstanding requests.')">
                     🚀 Run Matching Now
@@ -58,6 +59,7 @@
             </form>
             
             <form th:action="@{/admin/matching/generate-recurring}" method="post" style="display: inline;">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
                 <button type="submit" class="btn" style="background: #0a6b2c;"
                         onclick="return confirm('Generate recurring requests for next week?')">
                     🔄 Generate Recurring Requests
@@ -65,6 +67,7 @@
             </form>
             
             <form th:action="@{/admin/matching/clear-matches}" method="post" style="display: inline;">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
                 <button type="submit" class="btn btn-danger"
                         onclick="return confirm('Clear ALL matches? This action cannot be undone!')">
                     🗑️ Clear All Matches
@@ -76,6 +79,7 @@
         <div class="manual-matching" style="margin-top: 16px; padding: 16px; background: #f9f9f9; border-radius: 8px;">
             <h4>Run Matching for Specific Week</h4>
             <form th:action="@{/admin/matching/run-for-week}" method="post" style="display: flex; gap: 8px; align-items: end;">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
                 <div class="form-row">
                     <label for="targetWeek">Target Week (Monday date):</label>
                     <input type="date" id="targetWeek" name="targetWeek" 

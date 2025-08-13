@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="fragments/layout :: head"></head>
+<head th:replace="fragments/header :: head"></head>
 <body>
-<header th:replace="fragments/layout :: header"></header>
+<header th:replace="fragments/header :: header"></header>
 
 <main class="container">
     <h2>Manage Availability</h2>
@@ -15,6 +15,7 @@
     
     <!-- Availability Grid -->
     <form th:action="@{/availability/bulk-update}" method="post">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
         <div class="availability-grid">
             <table class="table availability-table">
                 <thead>
@@ -47,8 +48,11 @@
         
         <div class="form-actions" style="margin-top: 16px;">
             <button type="submit" class="btn">Update Availability</button>
-            <a th:href="@{/availability/clear}" class="btn btn-danger" 
-               onclick="return confirm('Are you sure you want to clear all availability?')">Clear All</a>
+            <form th:action="@{/availability/clear}" method="post" style="display: inline-block;">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                <button type="submit" class="btn btn-danger" 
+                        onclick="return confirm('Are you sure you want to clear all availability?')">Clear All</button>
+            </form>
         </div>
     </form>
     

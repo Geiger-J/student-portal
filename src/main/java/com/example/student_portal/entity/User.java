@@ -77,19 +77,19 @@ public class User {
     private Role role = Role.STUDENT;
 
     /**
-     * Year group for students. Required for all students.
+     * Year group for students. Can be null at registration, must be set in profile.
      */
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = true)
     private YearGroup yearGroup;
 
     /**
      * Exam board for sixth form (Year 12 & 13). For years below sixth form, this
-     * should be NONE.
+     * should be NONE. Can be null at registration, must be set in profile.
      */
     @Enumerated(EnumType.STRING)
-    @Column(name = "exam_board", nullable = false)
-    private ExamBoard examBoard = ExamBoard.NONE;
+    @Column(name = "exam_board", nullable = true)
+    private ExamBoard examBoard;
 
     /**
      * Subjects this user studies or can tutor.

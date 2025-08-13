@@ -24,10 +24,10 @@ public class RegistrationDto {
     @Size(min = 8, message = "Password must be at least 8 characters long")
     private String password;
 
-    @NotNull
+    // Year group and exam board are now optional at registration
+    // They can be set later in the profile
     private YearGroup yearGroup;
 
-    @NotNull
     private ExamBoard examBoard;
 
     public String getFullName() { return fullName; }

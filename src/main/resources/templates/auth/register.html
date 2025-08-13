@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="fragments/layout :: head"></head>
+<head th:replace="fragments/header :: head"></head>
 <body>
-<header th:replace="fragments/layout :: header"></header>
+<header th:replace="fragments/header :: header"></header>
 
 <main class="auth-container container">
     <div class="auth-card">
@@ -33,24 +33,6 @@
                 <label>Password</label>
                 <input type="password" th:field="*{password}" minlength="8" required/>
                 <div class="field-error" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
-            </div>
-
-            <div class="form-group">
-                <label>Year Group</label>
-                <select th:field="*{yearGroup}" required>
-                    <option value="" disabled>Choose...</option>
-                    <option th:each="yg : ${yearGroups}" th:value="${yg}" th:text="${yg}"></option>
-                </select>
-                <div class="field-error" th:if="${#fields.hasErrors('yearGroup')}" th:errors="*{yearGroup}"></div>
-            </div>
-
-            <div class="form-group">
-                <label>Exam Board</label>
-                <select th:field="*{examBoard}" required>
-                    <option value="" disabled>Choose...</option>
-                    <option th:each="eb : ${examBoards}" th:value="${eb}" th:text="${eb}"></option>
-                </select>
-                <div class="field-error" th:if="${#fields.hasErrors('examBoard')}" th:errors="*{examBoard}"></div>
             </div>
 
             <div class="form-actions">
