@@ -39,26 +39,24 @@ public class AuthController {
     @GetMapping("/register")
     public String registerForm(Model model) {
         model.addAttribute("form", new RegistrationDto());
-        model.addAttribute("yearGroups", YearGroup.values());
-        model.addAttribute("examBoards", ExamBoard.values());
+        // Year group and exam board are now collected in profile editing
         return "auth/register";
     }
 
     @PostMapping("/register")
     public String registerSubmit(@Valid @ModelAttribute("form") RegistrationDto form, BindingResult errors, Model model) {
-        log.debug("POST /register attempt email={} yearGroup={} examBoard={}", form.getEmail(), form.getYearGroup(), form.getExamBoard());
+        log.debug("POST /register attempt email={}", form.getEmail());
 
         if (userService.existsByEmail(form.getEmail())) {
             errors.rejectValue("email", "exists", "Email already in use");
         }
         if (errors.hasErrors()) {
             log.debug("Registration validation errors: {}", errors);
-            model.addAttribute("yearGroups", YearGroup.values());
-            model.addAttribute("examBoards", ExamBoard.values());
             return "auth/register";
         }
 
-        userService.registerUser(form.getFullName(), form.getEmail(), form.getPassword(), form.getYearGroup(), form.getExamBoard());
+        // Register with null yearGroup and examBoard - they'll be set in profile
+        userService.registerUser(form.getFullName(), form.getEmail(), form.getPassword(), null, null);
 
         // Auto-login
         Authentication auth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(form.getEmail(), form.getPassword()));

@@ -1,7 +1,10 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" th:replace="fragments/layout :: content">
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/header :: head"></head>
 <body>
-<div th:fragment="content">
+<header th:replace="fragments/header :: header"></header>
+
+<main class="container">
     <h2>Admin Dashboard</h2>
 
     <div th:if="${lowTutorAvailability}" class="alert alert-warning">
@@ -28,6 +31,13 @@
         <li th:each="m : ${matches}"
             th:text="${m.tutorRequest.user.fullName + ' ↔ ' + m.tuteeRequest.user.fullName + ' (' + m.matchedTimeslot.label + ')'}"></li>
     </ul>
-</div>
+</main>
+
+<footer class="footer">
+    <div class="container">
+        <p>&copy; <span th:text="${#dates.format(#dates.createNow(), 'yyyy')}">2025</span> Bromsgrove School</p>
+    </div>
+</footer>
+
 </body>
 </html>

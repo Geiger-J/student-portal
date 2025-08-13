@@ -35,24 +35,6 @@
                 <div class="field-error" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
             </div>
 
-            <div class="form-group">
-                <label>Year Group</label>
-                <select th:field="*{yearGroup}" required>
-                    <option value="" disabled>Choose...</option>
-                    <option th:each="yg : ${yearGroups}" th:value="${yg}" th:text="${yg}"></option>
-                </select>
-                <div class="field-error" th:if="${#fields.hasErrors('yearGroup')}" th:errors="*{yearGroup}"></div>
-            </div>
-
-            <div class="form-group">
-                <label>Exam Board</label>
-                <select th:field="*{examBoard}" required>
-                    <option value="" disabled>Choose...</option>
-                    <option th:each="eb : ${examBoards}" th:value="${eb}" th:text="${eb}"></option>
-                </select>
-                <div class="field-error" th:if="${#fields.hasErrors('examBoard')}" th:errors="*{examBoard}"></div>
-            </div>
-
             <div class="form-actions">
                 <button type="submit" class="button primary full">Register</button>
             </div>
