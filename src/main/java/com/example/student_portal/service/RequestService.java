@@ -93,6 +93,22 @@ public class RequestService {
         return requestRepository.findById(id).orElse(null);
     }
 
+    public Request getRequestById(Long id) {
+        return requestRepository.findById(id).orElse(null);
+    }
+
+    public Request updateRequest(Request request) {
+        return requestRepository.save(request);
+    }
+
+    public Request createRequest(Request request) {
+        return requestRepository.save(request);
+    }
+
+    public List<Request> getAllRequests() {
+        return requestRepository.findAll();
+    }
+
     public void deleteRequest(Long id) {
         requestRepository.deleteById(id);
     }

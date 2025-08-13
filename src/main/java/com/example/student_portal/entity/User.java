@@ -6,6 +6,7 @@ import java.util.Set;
 import com.example.student_portal.model.ExamBoard;
 import com.example.student_portal.model.Role;
 import com.example.student_portal.model.YearGroup;
+import com.example.student_portal.model.TeachingMode;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -17,7 +18,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.persistence.CascadeType;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -100,6 +103,27 @@ public class User {
     @JoinTable(name = "user_timeslots", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "timeslot_id"))
     private Set<Timeslot> availableTimeslots = new HashSet<>();
 
+    /**
+     * Maximum number of tutoring sessions per week this user can handle.
+     * Used by the matching algorithm to respect tutor capacity constraints.
+     */
+    @Column(name = "max_sessions_per_week")
+    private Integer maxSessionsPerWeek = 3; // Default to 3 sessions per week
+
+    /**
+     * Teaching mode preference for this user.
+     * Stored but not yet used in matching (future extension).
+     */
+    @Enumerated(EnumType.STRING)
+    @Column(name = "teaching_mode")
+    private TeachingMode teachingMode = TeachingMode.IN_PERSON;
+
+    /**
+     * Availability slots for this user (new approach using day/period structure).
+     */
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<AvailabilitySlot> availabilitySlots = new HashSet<>();
+
     public User() {}
 
     // Getters and setters
@@ -136,4 +160,32 @@ public class User {
     public Set<Timeslot> getAvailableTimeslots() { return availableTimeslots; }
 
     public void setAvailableTimeslots(Set<Timeslot> availableTimeslots) { this.availableTimeslots = availableTimeslots; }
+
+    public Integer getMaxSessionsPerWeek() { return maxSessionsPerWeek; }
+
+    public void setMaxSessionsPerWeek(Integer maxSessionsPerWeek) { this.maxSessionsPerWeek = maxSessionsPerWeek; }
+
+    public TeachingMode getTeachingMode() { return teachingMode; }
+
+    public void setTeachingMode(TeachingMode teachingMode) { this.teachingMode = teachingMode; }
+
+    public Set<AvailabilitySlot> getAvailabilitySlots() { return availabilitySlots; }
+
+    public void setAvailabilitySlots(Set<AvailabilitySlot> availabilitySlots) { this.availabilitySlots = availabilitySlots; }
+
+    /**
+     * Helper method to add an availability slot.
+     */
+    public void addAvailabilitySlot(AvailabilitySlot slot) {
+        availabilitySlots.add(slot);
+        slot.setUser(this);
+    }
+
+    /**
+     * Helper method to remove an availability slot.
+     */
+    public void removeAvailabilitySlot(AvailabilitySlot slot) {
+        availabilitySlots.remove(slot);
+        slot.setUser(null);
+    }
 }
