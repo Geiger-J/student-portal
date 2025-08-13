@@ -20,7 +20,6 @@ public class SecurityConfig {
         return http.build();
     }
 
-    // Expose AuthenticationManager for programmatic login after registration
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception { return configuration.getAuthenticationManager(); }
 }

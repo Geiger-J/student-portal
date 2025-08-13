@@ -15,12 +15,12 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     public CustomUserDetailsService(UserRepository userRepository) { this.userRepository = userRepository; }
 
-    // "username" is the email from the login form
+    // "username" is the email submitted from the login form
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User u = userRepository.findByEmail(username.toLowerCase()).orElseThrow(() -> new UsernameNotFoundException("No user with email " + username));
 
-        return org.springframework.security.core.userdetails.User.withUsername(u.getEmail()).password(u.getPasswordHash()).roles(u.getRole().name()) // becomes ROLE_STUDENT / ROLE_ADMIN
-                .accountExpired(false).accountLocked(false).credentialsExpired(false).disabled(false).build();
+        return org.springframework.security.core.userdetails.User.withUsername(u.getEmail()).password(u.getPasswordHash()).roles(u.getRole().name()) // -> ROLE_STUDENT / ROLE_ADMIN
+                .build();
     }
 }
